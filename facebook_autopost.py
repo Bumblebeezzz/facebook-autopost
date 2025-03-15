@@ -55,3 +55,48 @@ def main():
     except Exception as e:
         logger.error(f"Erreur inattendue dans le processus principal: {str(e)}")
         return False
+
+def post_to_facebook(content, image_path=None):
+    """Publie le contenu et l'image sur Facebook"""
+    try:
+        logger.info("Tentative de publication sur Facebook")
+        logger.info(f"Token: {FB_ACCESS_TOKEN[:10]}...{FB_ACCESS_TOKEN[-10:]} (premières et dernières lettres)")
+        logger.info(f"Page ID: {FB_PAGE_ID}")
+        logger.info(f"Contenu à publier: {content}")
+        
+        page = Page(FB_PAGE_ID)
+        
+        if image_path:
+            # Publication avec image
+            with open(image_path, "rb") as image_file:
+                image_data = image_file.read()
+            
+            logger.info("Envoi d'une publication avec image")
+            response = page.create_photo(
+                params={
+                    'message': content,
+                },
+                files={
+                    'source': image_data,
+                }
+            )
+        else:
+            # Publication sans image
+            logger.info("Envoi d'une publication sans image")
+            response = page.create_feed(
+                params={
+                    'message': content,
+                }
+            )
+        
+        # Log de la réponse complète
+        logger.info(f"Réponse complète de Facebook: {response}")
+        
+        post_id = response.get('id', 'unknown')
+        logger.info(f"Publication réussie! ID: {post_id}")
+        return True, post_id
+    
+    except Exception as e:
+        logger.error(f"Erreur lors de la publication sur Facebook: {str(e)}")
+        logger.error(f"Détails complets de l'erreur: {repr(e)}")
+        return False, str(e)
