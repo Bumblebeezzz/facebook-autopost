@@ -36,11 +36,4 @@ jobs:
       
     - name: Exécution du script de publication
       run: python facebook_autopost.py
-      
-    - name: Archivage des images générées (optionnel)
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: generated-images
-        path: images/
-        retention-days: 7
+    
